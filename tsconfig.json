@@ -1,0 +1,38 @@
+{
+    "compilerOptions": {
+        "target": "ES2020", // Specify ECMAScript target version
+        "lib": ["dom", "dom.iterable", "esnext"], // List of library files to be included in the compilation
+        "allowJs": false, // Allow JavaScript files to be compiled
+        "allowSyntheticDefaultImports": true, // Allow default imports from modules with no default export
+        "baseUrl": "src",
+        "declaration": true, // Generate corresponding .d.ts file
+        "esModuleInterop": true, // Disables namespace imports (import * as fs from "fs") and enables CJS/AMD/UMD style imports (import fs from "fs")
+        "experimentalDecorators": true, // Enables experimental support for ES decorators
+        "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file.
+        "importHelpers": true,
+        "incremental": true, // Enable incremental compilation by reading/writing information from prior compilations to a file on disk
+        "allowUnreachableCode": false, // Warnings are only about code which is provably unreachable due to the use of JavaScript syntax.
+        "emitDecoratorMetadata": true, // Enables experimental support for emitting type metadata for decorators which works with the module reflect-metadata.
+        "importsNotUsedAsValues": "error", // This flag controls how import works, there are 3 different options:.
+        "noImplicitOverride": true, // When working with classes which use inheritance, it’s possible for a sub-class to get “out of sync” with the functions it overloads when they are renamed in the base class.
+        "noPropertyAccessFromIndexSignature": true, // This setting ensures consistency between accessing a field via the “dot” (obj.key) syntax, and “indexed” (obj["key"]) and the way which the property is declared in the type.
+        "module": "esnext", // Specify module code generation
+        "moduleResolution": "node", // Resolve modules using Node.js style
+        "checkJs": true,
+        "newLine": "LF",
+        "noEmit": true, // Do not emit output (meaning do not compile code, only perform type checking)
+        "noFallthroughCasesInSwitch": true, // Report errors for fallthrough cases in switch statement
+        "noImplicitReturns": true, // When enabled, TypeScript will check all code paths in a function to ensure they return a value.
+        "noUnusedLocals": true, // Report errors on unused locals
+        "noUnusedParameters": true, // Report errors on unused parameters
+        "resolveJsonModule": true, // Include modules imported with .json extension
+        "skipLibCheck": true, // Skip type checking of all declaration files
+        "sourceMap": true, // Generate corresponding .map file
+        "strict": true, // Enable all strict type checking options.
+        "suppressImplicitAnyIndexErrors": true
+    },
+    "include": [
+        "src/**/*" // *** The files TypeScript should type check ***
+    ],
+    "exclude": ["node_modules", "build", "scripts"] // *** The files to not type check ***
+}
