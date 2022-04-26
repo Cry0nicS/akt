@@ -7,9 +7,16 @@ module.exports = /** @type {import("@cspell/cspell-types").FileSettings} */ ({
     language: "en-GB",
     files: ["/*.{js,json,md}", "/.*.js"],
     ignorePaths: ["package-lock.json"],
-    ignoreWords: ["commitlint", "esports", "gamer", "gaming", "popescu"],
     cache: {
         useCache: true,
         cacheLocation: "node_modules/.cache/cspell",
     },
+    dictionaries: ["custom"],
+    dictionaryDefinitions: [
+        {
+            name: "custom",
+            path: "custom.dic",
+            addWords: true,
+        },
+    ],
 });

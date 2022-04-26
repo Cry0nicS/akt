@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/naming-convention -- Externally named. */
+
 "use strict";
 
 const baseConfig = require("@glen-84/eslint-config");
