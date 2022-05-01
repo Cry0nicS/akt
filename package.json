@@ -1,23 +1,34 @@
 {
     "author": "Adrian Popescu",
     "name": "@cry0nics/akt",
-    "version": "1.0.0",
     "description": "Apollo-Koa-TypeScript API playground. ",
     "scripts": {
         "format-check": "prettier --check \"*.{js,json}\"",
         "format": "prettier --write \"*.{js,json}\"",
         "lint:scripts": "eslint \"*.js\"",
         "lint": "concurrently \"npm:lint:*\"",
-        "spell-check": "cspell --no-progress"
+        "spell-check": "cspell --no-progress",
+        "start": "nodemon --exec \"npx tsc && node dist/index.js\" --watch src --ext ts"
     },
     "keywords": [],
-    "license": "ISC",
+    "dependencies": {
+        "apollo-server-core": "^3.6.7",
+        "apollo-server-koa": "^3.6.7",
+        "casual": "^1.6.2",
+        "class-validator": "^0.13.2",
+        "graphql": "^15.7.2",
+        "koa": "^2.13.4",
+        "reflect-metadata": "^0.1.13",
+        "type-graphql": "^1.1.1"
+    },
     "devDependencies": {
         "@commitlint/cli": "^16.2.3",
         "@commitlint/config-conventional": "^16.2.1",
         "@glen-84/eslint-config": "^4.5.0",
         "@glen-84/prettier-config": "^2.3.0",
-        "@types/node": "^17.0.27",
+        "@types/graphql": "^14.5.0",
+        "@types/koa": "^2.13.4",
+        "@types/node": "^17.0.29",
         "@typescript-eslint/eslint-plugin": "^5.21.0",
         "@typescript-eslint/parser": "^5.21.0",
         "concurrently": "^7.1.0",
@@ -26,8 +37,10 @@
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-simple-import-sort": "^7.0.0",
         "lint-staged": "^12.4.1",
+        "nodemon": "^2.0.16",
         "prettier": "2.6.2",
         "simple-git-hooks": "^2.7.0",
+        "ts-node": "^10.7.0",
         "typescript": "^4.6.3"
     },
     "lint-staged": {
@@ -38,5 +51,6 @@
     "simple-git-hooks": {
         "commit-msg": "npx commitlint --edit \"$1\"",
         "pre-commit": "npx lint-staged"
-    }
+    },
+    "prettier": "@glen-84/prettier-config"
 }

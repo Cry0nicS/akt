@@ -9,14 +9,14 @@ module.exports = /** @type {import("@cspell/cspell-types").FileSettings} */ ({
     ignorePaths: ["package-lock.json"],
     cache: {
         useCache: true,
-        cacheLocation: "node_modules/.cache/cspell",
+        cacheLocation: "node_modules/.cache/cspell"
     },
     dictionaries: ["custom"],
     dictionaryDefinitions: [
         {
             name: "custom",
             path: "custom.dic",
-            addWords: true,
-        },
-    ],
+            addWords: true
+        }
+    ]
 });

@@ -22,6 +22,6 @@ module.exports = {
         "header-min-length": [2, "always", MIN_LENGTH],
         "scope-empty": [2, "always"],
         "subject-empty": [2, "always"],
-        "type-empty": [2, "always"],
-    },
+        "type-empty": [2, "always"]
+    }
 };

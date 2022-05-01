@@ -7,14 +7,14 @@ const baseConfig = require("@glen-84/eslint-config");
 module.exports = {
     extends: ["@glen-84", "prettier"],
     parserOptions: {
-        project: "tsconfig.eslint.json",
+        project: "tsconfig.eslint.json"
     },
     env: {
-        es6: true,
+        es6: true
     },
     rules: {
         // Place to specify ESLint rules.
-        "@typescript-eslint/quotes": ["error", "double", { avoidEscape: true }],
+        "@typescript-eslint/quotes": ["error", "double", {avoidEscape: true}]
     },
     // Lint .*.js files in the project root directory.
     ignorePatterns: ["!/.*.js"],
@@ -25,11 +25,11 @@ module.exports = {
             rules: {
                 "@typescript-eslint/no-require-imports": "off",
                 "@typescript-eslint/no-var-requires": "off",
-                strict: ["error", "global"],
+                "strict": ["error", "global"]
             },
             parserOptions: {
-                sourceType: "script",
-            },
-        },
-    ],
+                sourceType: "script"
+            }
+        }
+    ]
 };
