@@ -1,10 +1,12 @@
+import "dotenv/config";
 import "reflect-metadata";
+import * as env from "env-var";
 import http from "http";
 import Koa from "koa";
 import {ApolloServerPluginDrainHttpServer} from "apollo-server-core";
 import {ApolloServer} from "apollo-server-koa";
 import {buildSchema} from "type-graphql";
-import {HeroClassResolver} from "./hero-class/resolvers/HeroClass";
+import {HeroClassResolver} from "./hero-class/resolvers/hero-class";
 
 (async (): Promise<void> => {
     const httpServer = http.createServer();
@@ -22,12 +24,14 @@ import {HeroClassResolver} from "./hero-class/resolvers/HeroClass";
     app.use(server.getMiddleware());
     httpServer.on("request", app.callback());
 
+    const port = env.get("TYPEORM_PORT").required().asPortNumber();
+
     await new Promise<void>((resolve) => {
-        httpServer.listen({port: 4000}, resolve);
+        httpServer.listen({port}, resolve);
     });
 
     // eslint-disable-next-line no-console -- Okay in this context
-    console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
+    console.log(`🚀 Server ready at http://localhost:${port.toString()}${server.graphqlPath}`);
 })().catch((e: unknown) => {
     // eslint-disable-next-line no-console -- Okay in this context.
     console.error(e);

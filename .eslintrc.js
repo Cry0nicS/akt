@@ -14,7 +14,8 @@ module.exports = {
     },
     rules: {
         // Place to specify ESLint rules.
-        "@typescript-eslint/quotes": ["error", "double", {avoidEscape: true}]
+        "@typescript-eslint/quotes": ["error", "double", {avoidEscape: true}],
+        "class-methods-use-this": "off" // Messes up with the resolvers since it cannot be static.
     },
     // Lint .*.js files in the project root directory.
     ignorePatterns: ["!/.*.js"],
