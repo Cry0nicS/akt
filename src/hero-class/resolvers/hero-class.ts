@@ -1,9 +1,22 @@
 import {Arg, Mutation, Query, Resolver} from "type-graphql";
 import {HeroClass} from "../models/hero-class";
 import {dataSource} from "../../app/data-source";
+import {HeroClassService} from "../services/hero.class";
+import {Repository} from "typeorm";
 
-@Resolver()
+@Resolver(() => HeroClass)
 class HeroClassResolver {
+    private readonly heroClassService: HeroClassService;
+    private readonly heroClassRepository: Repository<HeroClass>;
+
+    public constructor(
+        heroClassService: HeroClassService,
+        heroClassRepository: Repository<HeroClass>
+    ) {
+        this.heroClassService = heroClassService;
+        this.heroClassRepository = heroClassRepository;
+    }
+
     @Query(() => [HeroClass])
     public async heroClasses(): Promise<HeroClass[]> {
         return dataSource.manager.find(HeroClass);
@@ -19,7 +32,9 @@ class HeroClassResolver {
         @Arg("name") name: string,
         @Arg("imageUrl") imageUrl: string
     ): Promise<HeroClass> {
-        return HeroClass.create({name, imageUrl}).save();
+        const heroClass = this.heroClassService.create({name, imageUrl});
+
+        return this.heroClassRepository.save(heroClass);
     }
 
     @Mutation(() => Boolean)

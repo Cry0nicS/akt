@@ -1,11 +1,11 @@
-import {BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
 import {Field, ID, ObjectType} from "type-graphql";
 import * as jf from "joiful";
-import {HeroAscendancy} from "../../hero-ascendency/models/hero-ascendancy";
+import {HeroClass} from "../../hero-class/models/hero-class";
 
-@Entity("hero_class")
+@Entity("hero_ascendancy")
 @ObjectType()
-class HeroClass extends BaseEntity {
+class HeroAscendancy extends BaseEntity {
     @Field(() => ID)
     @jf.number().positive().required()
     @PrimaryGeneratedColumn()
@@ -21,10 +21,14 @@ class HeroClass extends BaseEntity {
     @jf.string().optional().min(1).max(255).uri({allowRelative: false})
     public imageUrl!: string;
 
-    @OneToMany(() => HeroAscendancy, (heroAscendancy) => heroAscendancy.heroClass, {cascade: true})
-    @Field(() => [HeroAscendancy])
-    @jf.array({elementClass: HeroAscendancy}).required()
-    public heroAscendancies!: HeroAscendancy[];
+    @Field(() => HeroClass, {nullable: false})
+    @jf.object({objectClass: HeroClass}).required()
+    @JoinColumn({name: "hero_class_id"})
+    @ManyToOne(() => HeroClass, (heroClass) => heroClass.heroAscendancies, {
+        onDelete: "CASCADE",
+        nullable: false
+    })
+    public heroClass!: HeroClass;
 }
 
-export {HeroClass};
+export {HeroAscendancy};

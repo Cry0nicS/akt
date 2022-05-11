@@ -1,3 +1,4 @@
 # Generated files.
 /package-lock.json
+dist
 package.json

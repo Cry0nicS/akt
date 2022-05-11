@@ -6,6 +6,7 @@ import Koa from "koa";
 import {ApolloServerPluginDrainHttpServer} from "apollo-server-core";
 import {ApolloServer} from "apollo-server-koa";
 import {buildSchema} from "type-graphql";
+import {HeroAscendancyResolver} from "./hero-ascendency/resolvers/hero-ascendancy";
 import {HeroClassResolver} from "./hero-class/resolvers/hero-class";
 
 (async (): Promise<void> => {
@@ -14,7 +15,7 @@ import {HeroClassResolver} from "./hero-class/resolvers/hero-class";
     const server = new ApolloServer({
         debug: true,
         schema: await buildSchema({
-            resolvers: [HeroClassResolver]
+            resolvers: [HeroClassResolver, HeroAscendancyResolver]
         }),
         plugins: [ApolloServerPluginDrainHttpServer({httpServer})]
     });
