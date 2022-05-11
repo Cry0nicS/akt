@@ -6,12 +6,14 @@ import {Repository} from "typeorm";
 
 @Resolver(() => HeroClass)
 class HeroAscendancyResolver {
+    // TODO: Move this to repository class.
     private readonly heroClassRepository: Repository<HeroClass>;
 
     public constructor(heroClassRepository: Repository<HeroClass>) {
         this.heroClassRepository = heroClassRepository;
     }
 
+    // TODO: move logic to a service.
     @Query(() => [HeroAscendancy])
     public async heroAscendancies(): Promise<HeroAscendancy[]> {
         return dataSource.manager.find(HeroAscendancy);

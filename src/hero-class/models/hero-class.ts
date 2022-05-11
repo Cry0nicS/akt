@@ -22,8 +22,8 @@ class HeroClass extends BaseEntity {
     public imageUrl!: string;
 
     @OneToMany(() => HeroAscendancy, (heroAscendancy) => heroAscendancy.heroClass, {cascade: true})
-    @Field(() => [HeroAscendancy])
-    @jf.array({elementClass: HeroAscendancy}).required()
+    @Field(() => [HeroAscendancy], {nullable: true})
+    @jf.array({elementClass: HeroAscendancy}).optional()
     public heroAscendancies!: HeroAscendancy[];
 }
 
