@@ -1,7 +1,7 @@
 import "dotenv/config";
 import * as env from "env-var";
 import {DataSource} from "typeorm";
-import {HeroAscendancy} from "../hero-ascendency/models/hero-ascendancy";
+import {HeroAscendancy} from "../hero-ascendancy/models/hero-ascendancy";
 import {HeroClass} from "../hero-class/models/hero-class";
 
 const dataSource = new DataSource({

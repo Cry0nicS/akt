@@ -7,7 +7,7 @@ import {ApolloServerPluginDrainHttpServer} from "apollo-server-core";
 import {ApolloServer} from "apollo-server-koa";
 import {buildSchema} from "type-graphql";
 import {Container} from "typedi";
-import {HeroAscendancyResolver} from "./hero-ascendency/resolvers/hero-ascendancy";
+import {HeroAscendancyResolver} from "./hero-ascendancy/resolvers/hero-ascendancy";
 import {HeroClassResolver} from "./hero-class/resolvers/hero-class";
 
 (async (): Promise<void> => {

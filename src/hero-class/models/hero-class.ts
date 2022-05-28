@@ -1,7 +1,7 @@
 import {BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {Field, ID, ObjectType} from "type-graphql";
 import * as jf from "joiful";
-import {HeroAscendancy} from "../../hero-ascendency/models/hero-ascendancy";
+import {HeroAscendancy} from "../../hero-ascendancy/models/hero-ascendancy";
 
 @Entity("hero_class")
 @ObjectType()

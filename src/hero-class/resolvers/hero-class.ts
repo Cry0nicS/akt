@@ -25,13 +25,13 @@ class HeroClassResolver {
 
     @Query(() => HeroClass, {nullable: true})
     public async heroClass(@Arg("id") id: number): Promise<HeroClass | null> {
-        return this.heroClassRepository.getHeroClass(id);
+        return this.heroClassService.getOneById(id);
     }
 
     @Mutation(() => HeroClass)
     public async create(
         @Arg("name") name: string,
-        @Arg("imageUrl") imageUrl: string
+        @Arg("imageUrl", {nullable: true}) imageUrl?: string
     ): Promise<HeroClass> {
         return this.heroClassService.create({name, imageUrl});
     }
