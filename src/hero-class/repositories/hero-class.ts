@@ -7,7 +7,11 @@ import {Repository} from "typeorm";
 class HeroClassRepository extends Repository<HeroClass> {
     private readonly heroClassRepository = dataSource.getRepository(HeroClass);
 
-    public async getHeroClasses(): Promise<HeroClass[]> {
+    public constructor() {
+        super(HeroClass, dataSource.manager);
+    }
+
+    public async findAll(): Promise<HeroClass[]> {
         return this.heroClassRepository.find({
             relations: {
                 heroAscendancies: true
@@ -15,7 +19,7 @@ class HeroClassRepository extends Repository<HeroClass> {
         });
     }
 
-    public async getHeroClass(id: number): Promise<HeroClass | null> {
+    public override async findOneById(id: number): Promise<HeroClass | null> {
         return this.heroClassRepository
             .createQueryBuilder("hc")
             .leftJoinAndSelect("hc.heroAscendancies", "ha")

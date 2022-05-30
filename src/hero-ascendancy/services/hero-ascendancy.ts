@@ -1,7 +1,7 @@
 import {Service} from "typedi";
 import {HeroAscendancyRepository} from "../repositories/hero-ascendancy";
 import {HeroAscendancy} from "../models/hero-ascendancy";
-import {HeroClassService} from "../../hero-class/services/hero.class";
+import {HeroClassService} from "../../hero-class/services/hero-class";
 import type {CreateAscendancyInput} from "../types/create-ascendancy";
 
 @Service()
@@ -17,9 +17,17 @@ class HeroAscendancyService {
         this.heroClassService = heroClassService;
     }
 
+    public async findAll(): Promise<HeroAscendancy[]> {
+        return this.heroAscendancyRepository.findAll();
+    }
+
+    public async findOneById(id: number): Promise<HeroAscendancy | null> {
+        return this.heroAscendancyRepository.findOneById(id);
+    }
+
     public async create(data: CreateAscendancyInput): Promise<HeroAscendancy> {
         const heroAscendancy = Object.assign(new HeroAscendancy(), data);
-        heroAscendancy.heroClass = await this.heroClassService.findOneById(data.heroClassId);
+        heroAscendancy.heroClass = await this.heroClassService.getOneById(data.heroClassId);
 
         return this.heroAscendancyRepository.save(heroAscendancy);
     }

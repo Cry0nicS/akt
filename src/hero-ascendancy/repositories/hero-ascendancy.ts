@@ -7,19 +7,22 @@ import {Repository} from "typeorm";
 class HeroAscendancyRepository extends Repository<HeroAscendancy> {
     private readonly heroAscendancyRepository = dataSource.getRepository(HeroAscendancy);
 
+    public constructor() {
+        super(HeroAscendancy, dataSource.manager);
+    }
+
     public async findAll(): Promise<HeroAscendancy[]> {
         return this.heroAscendancyRepository.find({
             relations: {heroClass: true}
         });
     }
 
-    public override async findOneById(id: number): Promise<HeroAscendancy> {
-        const heroAscendancy = await this.heroAscendancyRepository.findOneBy({id});
-
-        if (!heroAscendancy)
-            throw new Error(`Hero ascendancy with ID "${id.toString()}" not found`);
-
-        return heroAscendancy;
+    public override async findOneById(id: number): Promise<HeroAscendancy | null> {
+        return this.heroAscendancyRepository
+            .createQueryBuilder("ha")
+            .innerJoinAndSelect("ha.heroClass", "hc")
+            .where("ha.id = :id", {id})
+            .getOne();
     }
 }
 
