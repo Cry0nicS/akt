@@ -24,7 +24,7 @@
         "graphql": "^15.7.2",
         "joiful": "^3.0.2",
         "koa": "^2.13.4",
-        "mysql": "^2.18.1",
+        "mysql2": "^2.3.3",
         "reflect-metadata": "^0.1.13",
         "type-graphql": "^1.1.1",
         "typedi": "^0.10.0",
