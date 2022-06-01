@@ -1,11 +1,11 @@
-import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
 import {Field, ID, ObjectType} from "type-graphql";
 import * as jf from "joiful";
 import {HeroClass} from "../../hero-class/models/hero-class";
 
 @Entity("hero_ascendancy")
 @ObjectType()
-class HeroAscendancy extends BaseEntity {
+class HeroAscendancy {
     @Field(() => ID)
     @jf.number().positive().required()
     @PrimaryGeneratedColumn()

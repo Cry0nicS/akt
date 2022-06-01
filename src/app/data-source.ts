@@ -1,8 +1,8 @@
 import "dotenv/config";
 import * as env from "env-var";
 import {DataSource} from "typeorm";
-import {HeroAscendancy} from "../hero-ascendancy/models/hero-ascendancy";
-import {HeroClass} from "../hero-class/models/hero-class";
+import {HeroAscendancy} from "../hero/hero-ascendancy/models/hero-ascendancy";
+import {HeroClass} from "../hero/hero-class/models/hero-class";
 
 const dataSource = new DataSource({
     type: env.get("TYPEORM_TYPE").default("mysql").asEnum(["mysql", "postgres"]),
