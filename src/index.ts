@@ -5,20 +5,30 @@ import http from "http";
 import Koa from "koa";
 import {ApolloServerPluginDrainHttpServer} from "apollo-server-core";
 import {ApolloServer} from "apollo-server-koa";
-import {buildSchema} from "type-graphql";
-import {Container} from "typedi";
-import {HeroAscendancyResolver} from "./hero/hero-ascendancy/resolvers/hero-ascendancy";
-import {HeroClassResolver} from "./hero/hero-class/resolvers/hero-class";
+import {createSchema} from "./app/config/schema";
+import {dataSource} from "./app/config/data-source";
 
 (async (): Promise<void> => {
     const httpServer = http.createServer();
 
+    dataSource
+        .initialize()
+        .then(() => {
+            // eslint-disable-next-line no-console -- Okay in this context
+            console.log("Initializing data source....!");
+        })
+        .then(() => {
+            // eslint-disable-next-line no-console -- Okay in this context
+            console.log("Data Source has been initialized!");
+        })
+        .catch((err) => {
+            // eslint-disable-next-line no-console -- Okay in this context
+            console.error("Error during Data Source initialization", err);
+        });
+
     const server = new ApolloServer({
         debug: true,
-        schema: await buildSchema({
-            container: Container, // Register TypeDi container.
-            resolvers: [HeroClassResolver, HeroAscendancyResolver]
-        }),
+        schema: await createSchema(),
         plugins: [ApolloServerPluginDrainHttpServer({httpServer})]
     });
 

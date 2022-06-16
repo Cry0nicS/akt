@@ -1,4 +1,4 @@
-import {dataSource} from "../../../app/data-source";
+import {dataSource} from "../../../app/config/data-source";
 import {HeroAscendancy} from "../models/hero-ascendancy";
 import {Service} from "typedi";
 import {Repository} from "typeorm";
