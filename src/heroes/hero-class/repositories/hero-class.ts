@@ -1,14 +1,15 @@
-import {dataSource} from "../../../app/config/data-source";
 import {HeroClass} from "../models/hero-class";
 import {Service} from "typedi";
-import {Repository} from "typeorm";
+import {DataSource, Repository} from "typeorm";
 
 @Service()
 class HeroClassRepository extends Repository<HeroClass> {
-    private readonly heroClassRepository = dataSource.getRepository(HeroClass);
+    private readonly heroClassRepository: Repository<HeroClass>;
 
-    public constructor() {
+    public constructor(dataSource: DataSource) {
         super(HeroClass, dataSource.manager);
+
+        this.heroClassRepository = dataSource.getRepository(HeroClass);
     }
 
     public async findAll(): Promise<HeroClass[]> {

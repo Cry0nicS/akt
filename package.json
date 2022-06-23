@@ -13,7 +13,7 @@
         "type-check": "tsc --noEmit",
         "typeorm": "ts-node ./node_modules/typeorm/cli.js",
         "test": "npm run db:setup && jest",
-        "db:setup": "ts-node ./src/tests/setup.ts"
+        "db:setup": "ts-node ./tests/setup.ts"
     },
     "keywords": [],
     "dependencies": {

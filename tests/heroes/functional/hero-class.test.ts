@@ -1,14 +1,15 @@
-import {testDataSource} from "../../../app/config/data-source";
 import {gqlHelper} from "../../gql-helper";
+import {Container} from "typedi";
 import type {DataSource} from "typeorm";
 
-let test: DataSource;
+const dataSource: DataSource = Container.get("data-source");
+
 beforeAll(async () => {
-    test = await testDataSource().initialize();
+    await dataSource.initialize();
 });
 
 afterAll(async () => {
-    await test.destroy();
+    await dataSource.destroy();
 });
 
 const createHeroClass = `

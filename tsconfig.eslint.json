@@ -3,6 +3,7 @@
     "include": [
         // This should match the `include` section in the main `tsconfig.json` file.
         "src",
+        "tests",
         // Lint JavaScript files that are not included in the build.
         "*.js",
         ".*.js"

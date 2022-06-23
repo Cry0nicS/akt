@@ -28,7 +28,7 @@ import {dataSource} from "./app/config/data-source";
 
     const server = new ApolloServer({
         debug: true,
-        schema: await createSchema(),
+        schema: await createSchema(dataSource),
         plugins: [ApolloServerPluginDrainHttpServer({httpServer})]
     });
 
