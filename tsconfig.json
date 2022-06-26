@@ -18,7 +18,6 @@
         "noUnusedParameters": false, //tmp
         "outDir": "dist",
         "resolveJsonModule": true,
-        "rootDir": "src",
         "skipLibCheck": true,
         "sourceMap": true,
         "strict": true,
@@ -27,6 +26,7 @@
     },
     "exclude": ["node_modules", "build", "scripts"], // *** The files to not type check ***
     "include": [
-        "./src/**/*" // *** The files TypeScript should type check ***
+        "./src/**/*", // *** The files TypeScript should type check ***
+        "./tests/**/*"
     ]
 }

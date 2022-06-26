@@ -5,20 +5,35 @@ import http from "http";
 import Koa from "koa";
 import {ApolloServerPluginDrainHttpServer} from "apollo-server-core";
 import {ApolloServer} from "apollo-server-koa";
-import {buildSchema} from "type-graphql";
 import {Container} from "typedi";
-import {HeroAscendancyResolver} from "./hero-ascendancy/resolvers/hero-ascendancy";
-import {HeroClassResolver} from "./hero-class/resolvers/hero-class";
+import {createSchema} from "./app/config/schema";
+import {dataSource} from "./app/config/data-source";
+import {DataSource} from "typeorm";
 
 (async (): Promise<void> => {
     const httpServer = http.createServer();
 
+    await dataSource
+        .initialize()
+        .then(() => {
+            // eslint-disable-next-line no-console -- Okay in this context
+            console.log("Initializing data source....!");
+        })
+        .then(() => {
+            Container.set(DataSource, dataSource);
+        })
+        .then(() => {
+            // eslint-disable-next-line no-console -- Okay in this context
+            console.log("Data Source has been initialized!");
+        })
+        .catch((err) => {
+            // eslint-disable-next-line no-console -- Okay in this context
+            console.error("Error during Data Source initialization", err);
+        });
+
     const server = new ApolloServer({
         debug: true,
-        schema: await buildSchema({
-            container: Container, // Register TypeDi container.
-            resolvers: [HeroClassResolver, HeroAscendancyResolver]
-        }),
+        schema: await createSchema(),
         plugins: [ApolloServerPluginDrainHttpServer({httpServer})]
     });
 
@@ -27,7 +42,7 @@ import {HeroClassResolver} from "./hero-class/resolvers/hero-class";
     app.use(server.getMiddleware());
     httpServer.on("request", app.callback());
 
-    const port = env.get("TYPEORM_PORT").required().asPortNumber();
+    const port = env.get("APOLLO_PORT").required().asPortNumber();
 
     await new Promise<void>((resolve) => {
         httpServer.listen({port}, resolve);
