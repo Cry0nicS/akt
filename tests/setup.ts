@@ -1,21 +1,23 @@
-import {DataSourceService} from "../src/app/config/data-source-bk";
-import {Container} from "typedi";
-import * as env from "env-var";
+import {testDataSource} from "./config/data-source";
 
-const dataSourceService = Container.get(DataSourceService);
+/**
+ * Executed once, before running the test case in order to refresh the database.
+ */
+(async (): Promise<void> => {
+    const dataSource = testDataSource(true);
+    // Drops the database and recreates it based on the existing entities.
+    await dataSource
+        .initialize()
+        .then(async () => dataSource.synchronize(true))
+        .then(() => {
+            // eslint-disable-next-line no-console -- Okay in this context.
+            console.dir("Data Source has been refreshed!");
+        })
+        // eslint-disable-next-line no-process-exit -- Required, for now, to exit the process.
+        .then(() => process.exit());
 
-const dataSource = dataSourceService.createDataSource(
-    env.get("APP_ENV").required().asString(),
-    true
-);
-
-dataSource
-    .initialize()
-    // eslint-disable-next-line no-process-exit -- Okay in this context.
-    .then(() => process.exit())
-    .catch((e) => {
-        // eslint-disable-next-line no-console -- Okay in this context.
-        console.error("Error during exiting test data source", e);
-    });
-
-Container.set("data-source", dataSource);
+    // TODO: Load base fixtures.
+})().catch((e) => {
+    // eslint-disable-next-line no-console -- Okay in this context.
+    console.error("Error while refreshing the database:", e);
+});

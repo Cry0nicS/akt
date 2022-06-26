@@ -5,17 +5,22 @@ import http from "http";
 import Koa from "koa";
 import {ApolloServerPluginDrainHttpServer} from "apollo-server-core";
 import {ApolloServer} from "apollo-server-koa";
+import {Container} from "typedi";
 import {createSchema} from "./app/config/schema";
 import {dataSource} from "./app/config/data-source";
+import {DataSource} from "typeorm";
 
 (async (): Promise<void> => {
     const httpServer = http.createServer();
 
-    dataSource
+    await dataSource
         .initialize()
         .then(() => {
             // eslint-disable-next-line no-console -- Okay in this context
             console.log("Initializing data source....!");
+        })
+        .then(() => {
+            Container.set(DataSource, dataSource);
         })
         .then(() => {
             // eslint-disable-next-line no-console -- Okay in this context
@@ -28,7 +33,7 @@ import {dataSource} from "./app/config/data-source";
 
     const server = new ApolloServer({
         debug: true,
-        schema: await createSchema(dataSource),
+        schema: await createSchema(),
         plugins: [ApolloServerPluginDrainHttpServer({httpServer})]
     });
 
@@ -37,7 +42,7 @@ import {dataSource} from "./app/config/data-source";
     app.use(server.getMiddleware());
     httpServer.on("request", app.callback());
 
-    const port = env.get("TYPEORM_PORT").required().asPortNumber();
+    const port = env.get("APOLLO_PORT").required().asPortNumber();
 
     await new Promise<void>((resolve) => {
         httpServer.listen({port}, resolve);

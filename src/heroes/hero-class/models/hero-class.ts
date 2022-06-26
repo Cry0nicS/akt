@@ -1,15 +1,15 @@
 import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm";
-import {Field, ID, ObjectType} from "type-graphql";
+import {Field, Int, ObjectType} from "type-graphql";
 import * as jf from "joiful";
 import {HeroAscendancy} from "../../hero-ascendancy/models/hero-ascendancy";
 
 @Entity("hero_class")
 @ObjectType()
 class HeroClass {
-    @Field(() => ID)
+    @Field(() => Int)
     @jf.number().positive().required()
     @PrimaryGeneratedColumn()
-    public id!: number;
+    public readonly id!: number;
 
     @Column({unique: true, type: "varchar", length: 50})
     @Field(() => String)
