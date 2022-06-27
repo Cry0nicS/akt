@@ -3,17 +3,20 @@
     "name": "@cry0nics/akt",
     "description": "Apollo-Koa-TypeScript API playground. ",
     "scripts": {
+        "build": "npx tsc",
         "clean": "rm -rf node_modules/ dist/",
+        "db:setup": "ts-node ./tests/setup.ts",
         "format": "prettier --write \"**/*.{js,json,ts}\"",
         "format-check": "prettier --check \"**/*.{js,json,ts}\"",
         "lint": "eslint \"src/**/*.ts\" \"*.js\"",
         "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync --dataSource ./dist/src/app/data/data-source.js",
         "spell-check": "cspell --no-progress",
-        "start": "nodemon --exec \"npx tsc && node dist/src/index.js\" --watch src --ext ts",
-        "type-check": "tsc --noEmit",
-        "typeorm": "ts-node ./node_modules/typeorm/cli.js",
+        "start": "ts-node-dev --respawn src/index.ts",
+        "start:nodemon": "nodemon --exec \"npx tsc && node dist/src/index.js\" --watch src --ext ts",
+        "start:prod": "npm run build && node dist/src/index.js",
         "test": "npm run db:setup && jest",
-        "db:setup": "ts-node ./tests/setup.ts"
+        "type-check": "tsc --noEmit",
+        "typeorm": "ts-node ./node_modules/typeorm/cli.js"
     },
     "keywords": [],
     "dependencies": {
@@ -54,6 +57,7 @@
         "simple-git-hooks": "^2.7.0",
         "ts-jest": "^28.0.5",
         "ts-node": "^10.7.0",
+        "ts-node-dev": "^2.0.0",
         "typescript": "^4.6.3"
     },
     "lint-staged": {
