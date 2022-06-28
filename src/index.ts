@@ -1,6 +1,6 @@
 import "dotenv/config";
 import "reflect-metadata";
-import * as env from "env-var";
+import env from "env-var";
 import http from "http";
 import Koa from "koa";
 import {ApolloServerPluginDrainHttpServer} from "apollo-server-core";

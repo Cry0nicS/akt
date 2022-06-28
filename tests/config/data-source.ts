@@ -1,11 +1,8 @@
 import "dotenv/config";
-import * as env from "env-var";
+import env from "env-var";
 import {DataSource} from "typeorm";
-import {HeroClass} from "../../src/heroes/hero-class/models/hero-class";
-import {HeroAscendancy} from "../../src/heroes/hero-ascendancy/models/hero-ascendancy";
 import {Container} from "typedi";
-
-const entities = [HeroClass, HeroAscendancy];
+import {entities} from "../../src/app/config/entities";
 
 const testDataSource = (refreshDb = false): DataSource =>
     new DataSource({

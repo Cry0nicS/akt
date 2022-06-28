@@ -3,7 +3,7 @@ import {Field, Int, ObjectType} from "type-graphql";
 import * as jf from "joiful";
 import {HeroAscendancy} from "../../hero-ascendancy/models/hero-ascendancy";
 
-@Entity("hero_class")
+@Entity("hero_classes")
 @ObjectType()
 class HeroClass {
     @Field(() => Int)

@@ -1,10 +1,7 @@
 import "dotenv/config";
-import * as env from "env-var";
+import env from "env-var";
 import {DataSource} from "typeorm";
-import {HeroAscendancy} from "../../heroes/hero-ascendancy/models/hero-ascendancy";
-import {HeroClass} from "../../heroes/hero-class/models/hero-class";
-
-const entities = [HeroClass, HeroAscendancy];
+import {entities} from "./entities";
 
 const dataSource = new DataSource({
     database: env.get("TYPEORM_NAME").required().asString(),
