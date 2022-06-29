@@ -1,3 +1,4 @@
+import * as jf from "joiful";
 import type {GraphQLSchema} from "graphql";
 import {buildSchema} from "type-graphql";
 import {Container} from "typedi";
@@ -11,7 +12,15 @@ const resolvers = [HeroClassResolver, HeroAscendancyResolver, UserResolver] as c
 const createSchema = async (): Promise<GraphQLSchema> =>
     buildSchema({
         container: Container, // Register TypeDi container.
-        resolvers
+        resolvers,
+        // Register Joiful as custom validator.
+        validate: (argValue, _argType) => {
+            const {error} = jf.validate(argValue);
+            if (error) {
+                // Throw error on failed validation.
+                throw error;
+            }
+        }
     });
 
 export {createSchema};

@@ -16,13 +16,7 @@ class UserResolver {
 
     @Mutation(() => User)
     public async createUser(@Arg("data") data: CreateUserInput): Promise<User> {
-        const {error} = jf.validate(data);
-
-        if (!error) {
-            return this.userService.create(data);
-        }
-
-        throw new Error(error.message);
+        return this.userService.create(data);
     }
 }
 
