@@ -4,6 +4,7 @@ import {User} from "../models/user";
 import {UserService} from "../services/user";
 import {CreateUserInput} from "../types/create-user";
 import {LoginResponse} from "./login-response";
+import {LoginUserInput} from "../types/login-user";
 
 @Service()
 @Resolver(() => User)
@@ -20,10 +21,7 @@ class UserResolver {
     }
 
     @Mutation(() => LoginResponse)
-    public async loginUser(
-        @Arg("email") email: Partial<User | "email">,
-        @Arg("password") password: string
-    ): Promise<LoginResponse> {
+    public async loginUser(@Arg("data") {email, password}: LoginUserInput): Promise<LoginResponse> {
         return this.userService.login(email, password);
     }
 }

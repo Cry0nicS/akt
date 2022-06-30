@@ -3,6 +3,7 @@ import {UserRepository} from "../repositories/user";
 import {User} from "../models/user";
 import type {CreateUserInput} from "../types/create-user";
 import type {LoginResponse} from "../resolvers/login-response";
+import type {LoginUserInput} from "../types/login-user";
 
 @Service()
 class UserService {
@@ -18,7 +19,7 @@ class UserService {
         return this.userRepository.save(user);
     }
 
-    public async getOneByEmail(email: Partial<User | "email">): Promise<User> {
+    public async getOneByEmail(email: string): Promise<User> {
         const user = await this.userRepository
             .createQueryBuilder("u")
             .where("u.email = :email", {email})
@@ -29,12 +30,12 @@ class UserService {
         return user;
     }
 
-    public async login(email: Partial<User | "email">, password: string): Promise<LoginResponse> {
+    public async login(email: string, password: string): Promise<LoginResponse> {
         const user = await this.getOneByEmail(email);
 
         if (await user.verifyPassword(password)) {
             return {
-                token: ""
+                token: "to-do"
             };
         }
 
