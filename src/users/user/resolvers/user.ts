@@ -3,7 +3,7 @@ import {Arg, Mutation, Resolver} from "type-graphql";
 import {User} from "../models/user";
 import {UserService} from "../services/user";
 import {CreateUserInput} from "../types/create-user";
-import * as jf from "joiful";
+import {LoginResponse} from "./login-response";
 
 @Service()
 @Resolver(() => User)
@@ -17,6 +17,14 @@ class UserResolver {
     @Mutation(() => User)
     public async createUser(@Arg("data") data: CreateUserInput): Promise<User> {
         return this.userService.create(data);
+    }
+
+    @Mutation(() => LoginResponse)
+    public async loginUser(
+        @Arg("email") email: Partial<User | "email">,
+        @Arg("password") password: string
+    ): Promise<LoginResponse> {
+        return this.userService.login(email, password);
     }
 }
 

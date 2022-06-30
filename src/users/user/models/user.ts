@@ -1,4 +1,4 @@
-import {BeforeInsert, Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn} from "typeorm";
 import {Field, Int, ObjectType} from "type-graphql";
 import * as jf from "joiful";
 import bcrypt from "bcryptjs";
@@ -49,12 +49,16 @@ class User {
         return null;
     }
 
+    public async verifyPassword(password: string): Promise<boolean> {
+        return bcrypt.compare(password, this.password);
+    }
+
     @BeforeInsert()
     private async hashPassword(): Promise<void> {
         this.password = await bcrypt.hash(this.password, 10);
     }
 
-    @BeforeInsert()
+    @BeforeUpdate()
     private updateDates(): void {
         // TODO: If a password is provided, hash it before updating.
     }
