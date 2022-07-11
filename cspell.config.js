@@ -5,7 +5,7 @@
 module.exports = /** @type {import("@cspell/cspell-types").FileSettings} */ ({
     version: "0.2",
     language: "en-GB",
-    files: ["/*.{js,json,md}", "/.*.js"],
+    files: ["**/*.{ts,js,json,md}", "/.*.{ts,js}"],
     ignorePaths: ["package-lock.json"],
     cache: {
         useCache: true,
