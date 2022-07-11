@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/naming-convention -- Externally named. */
+/* eslint-disable @typescript-eslint/naming-convention -- Externally named. */
 
 "use strict";
-
-const baseConfig = require("@glen-84/eslint-config");
 
 module.exports = {
     extends: ["@glen-84", "prettier"],
