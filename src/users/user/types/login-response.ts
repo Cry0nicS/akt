@@ -3,7 +3,7 @@ import {Field, ObjectType} from "type-graphql";
 @ObjectType()
 class LoginResponse {
     @Field(() => String)
-    public token!: string;
+    public accessToken!: string;
 }
 
 export {LoginResponse};

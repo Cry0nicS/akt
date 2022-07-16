@@ -1,8 +1,10 @@
 import "dotenv/config";
 import "reflect-metadata";
+import cors from "@koa/cors";
 import env from "env-var";
 import http from "http";
 import Koa from "koa";
+import type {Context} from "./app/utils/interfaces/context";
 import {ApolloServerPluginDrainHttpServer} from "apollo-server-core";
 import {ApolloServer} from "apollo-server-koa";
 import {Container} from "typedi";
@@ -11,8 +13,7 @@ import {dataSource} from "./app/config/data-source";
 import {DataSource} from "typeorm";
 
 (async (): Promise<void> => {
-    const httpServer = http.createServer();
-
+    // Initialize TypeORM data-source.
     await dataSource
         .initialize()
         .then(() => {
@@ -31,15 +32,40 @@ import {DataSource} from "typeorm";
             console.error("Error during Data Source initialization", err);
         });
 
+    // Create a new Apollo server.
+    const httpServer = http.createServer();
     const server = new ApolloServer({
         debug: true,
         schema: await createSchema(),
-        plugins: [ApolloServerPluginDrainHttpServer({httpServer})]
+        plugins: [ApolloServerPluginDrainHttpServer({httpServer})],
+        csrfPrevention: true,
+        cache: "bounded",
+        context: ({ctx}) => ctx as Context
     });
 
+    // Start has to be called before using the middleware integration.
     await server.start();
+
+    // Configure Koa Middleware.
     const app = new Koa();
-    app.use(server.getMiddleware());
+    app.proxy = true;
+    app.use(
+        cors({
+            credentials: true,
+            origin: (ctx: Context): string => {
+                const validDomains = ["https://studio.apollographql.com", "http://localhost:4000"];
+
+                if (ctx.headers.origin !== undefined && validDomains.includes(ctx.headers.origin)) {
+                    return ctx.headers.origin;
+                }
+
+                // Void is not valid, therefore we must return a default origin.
+                return validDomains[0];
+            }
+        })
+    );
+
+    app.use(server.getMiddleware({cors: true}));
     httpServer.on("request", app.callback());
 
     const port = env.get("APOLLO_PORT").required().asPortNumber();
