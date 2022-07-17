@@ -8,10 +8,7 @@ class LoginUserInput implements Partial<User> {
     @jf.string().required().email().min(3).max(255)
     public email!: string;
 
-    @Field(() => String, {
-        description:
-            "Minimum eight characters, at least one letter, one number and one special character"
-    })
+    @Field(() => String)
     @jf.string().required()
     public password!: string;
 }

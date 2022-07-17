@@ -1,7 +1,7 @@
-import {BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn} from "typeorm";
-import {Field, Int, ObjectType} from "type-graphql";
 import * as jf from "joiful";
 import bcrypt from "bcryptjs";
+import {BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Field, Int, ObjectType} from "type-graphql";
 
 @Entity("users")
 @ObjectType()
