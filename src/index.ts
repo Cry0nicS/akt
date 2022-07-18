@@ -1,6 +1,5 @@
 import "dotenv/config";
 import "reflect-metadata";
-import cors from "@koa/cors";
 import env from "env-var";
 import http from "http";
 import Koa from "koa";
@@ -40,7 +39,7 @@ import {DataSource} from "typeorm";
         plugins: [ApolloServerPluginDrainHttpServer({httpServer})],
         csrfPrevention: true,
         cache: "bounded",
-        context: ({ctx}) => ctx as Context
+        context: ({ctx}: {ctx: Context}) => ctx
     });
 
     // Start has to be called before using the middleware integration.
@@ -49,23 +48,30 @@ import {DataSource} from "typeorm";
     // Configure Koa Middleware.
     const app = new Koa();
     app.proxy = true;
+
     app.use(
-        cors({
-            credentials: true,
-            origin: (ctx: Context): string => {
-                const validDomains = ["https://studio.apollographql.com", "http://localhost:4000"];
+        server.getMiddleware({
+            cors: {
+                credentials: true,
+                origin: (ctx: Context): string => {
+                    const validDomains = [
+                        "https://studio.apollographql.com",
+                        "http://localhost:4000"
+                    ];
 
-                if (ctx.headers.origin !== undefined && validDomains.includes(ctx.headers.origin)) {
-                    return ctx.headers.origin;
+                    if (
+                        ctx.headers.origin !== undefined &&
+                        validDomains.includes(ctx.headers.origin)
+                    ) {
+                        return ctx.headers.origin;
+                    }
+
+                    // Void is not valid, therefore we must return a default origin.
+                    return validDomains[0];
                 }
-
-                // Void is not valid, therefore we must return a default origin.
-                return validDomains[0];
             }
         })
     );
-
-    app.use(server.getMiddleware({cors: true}));
     httpServer.on("request", app.callback());
 
     const port = env.get("APOLLO_PORT").required().asPortNumber();
