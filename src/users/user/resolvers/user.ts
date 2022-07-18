@@ -1,5 +1,5 @@
 import env from "env-var";
-import {Arg, Ctx, Mutation, Query, Resolver, UseMiddleware} from "type-graphql";
+import {Arg, Ctx, Int, Mutation, Query, Resolver, UseMiddleware} from "type-graphql";
 import {CreateUserInput} from "../types/create-user";
 import {isAuthenticated} from "../services/authenticate";
 import {LoginResponse} from "../types/login-response";
@@ -58,20 +58,44 @@ class UserResolver {
         };
     }
 
+    /**
+     * This mutation is only used for testing purposes.
+     * User's refresh tokens should be revoked when the user logs out or forget the password..
+     */
+    @Mutation(() => Boolean)
+    public async revokeUserRefreshToken(
+        @Arg("userId", () => Int) userId: number
+    ): Promise<boolean> {
+        await this.userService.incrementUserRefreshToken(userId);
+
+        return true;
+    }
+
     @Mutation(() => LoginResponse)
     public async refreshToken(@Ctx() ctx: Context): Promise<LoginResponse> {
         const currentRefreshToken = ctx.cookies.get("gid");
 
         if (currentRefreshToken === undefined) throw new Error("No refresh token found.");
 
-        const userId = await UserService.validateJwtToken(
+        const payload = await UserService.validateJwtToken(
             currentRefreshToken,
             env.get("EDDSA_REFRESH_PUBLIC").required().asString()
         );
 
+        const userId = payload.sub ?? null;
+        const payloadTokenVersion = payload.jti ?? null;
+
         if (userId === null) throw new Error("Refresh token is invalid.");
 
         const user = await this.userService.getOneById(parseInt(userId, 10));
+
+        // Compare to token version stored in the database with the one from the payload.
+        if (
+            payloadTokenVersion === null ||
+            user.tokenVersion !== parseInt(payloadTokenVersion, 10)
+        ) {
+            throw new Error("Refresh token is invalid.");
+        }
 
         // Regenerate the refresh token and store it in the cookie.
         await UserResolver.createdRefreshToken(user, ctx);
@@ -93,7 +117,7 @@ class UserResolver {
             env.get("JWT_REFRESH_EXPIRATION_TIME").required().asString()
         );
 
-        ctx.cookies.set("gid", refreshToken, {httpOnly: true});
+        ctx.cookies.set("gid", refreshToken, {httpOnly: true, secure: true, sameSite: "none"});
     }
 }
 

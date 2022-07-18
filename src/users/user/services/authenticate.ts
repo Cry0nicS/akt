@@ -16,12 +16,16 @@ const isAuthenticated: MiddlewareFn<Context> = async ({context}, next) => {
     const token = authorization.split(" ")[1];
 
     // Validate the access token and store it in the context.
-    const userId = await UserService.validateJwtToken(
+    const payload = await UserService.validateJwtToken(
         token,
         env.get("EDDSA_ACCESS_PUBLIC").required().asString()
     );
 
+    const userId = payload.sub ?? null;
+
     if (userId === null) throw new Error("Unexpected error while authenticating.");
+
+    // TODO: validate the user's token version.
 
     context.activeUserId = userId;
 

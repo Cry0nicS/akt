@@ -40,6 +40,10 @@ class User {
         .regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/u)
     public password!: string;
 
+    @Column({type: "int", default: 0})
+    @jf.number().positive().default(0)
+    public tokenVersion = 0;
+
     @Field(() => String, {nullable: true})
     public fullName(): string | null {
         if (this.firstName !== null && this.lastName !== null) {
