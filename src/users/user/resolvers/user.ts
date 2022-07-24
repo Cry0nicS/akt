@@ -34,6 +34,13 @@ class UserResolver {
         return this.userService.create(data);
     }
 
+    @Mutation(() => Boolean)
+    public logoutUser(@Ctx() ctx: Context): boolean {
+        UserResolver.setRefreshTokenCookie(ctx, "");
+
+        return true;
+    }
+
     @Mutation(() => LoginResponse)
     public async loginUser(
         @Arg("data") {email, password}: LoginUserInput,
@@ -90,6 +97,7 @@ class UserResolver {
         const user = await this.userService.getOneById(parseInt(userId, 10));
 
         // Compare to token version stored in the database with the one from the payload.
+        // TODO: Move this to a service method and use it in the authentication middleware.
         if (
             payloadTokenVersion === null ||
             user.tokenVersion !== parseInt(payloadTokenVersion, 10)
@@ -117,7 +125,11 @@ class UserResolver {
             env.get("JWT_REFRESH_EXPIRATION_TIME").required().asString()
         );
 
-        ctx.cookies.set("gid", refreshToken, {httpOnly: true, secure: true, sameSite: "none"});
+        UserResolver.setRefreshTokenCookie(ctx, refreshToken);
+    }
+
+    private static setRefreshTokenCookie(ctx: Context, token: string): void {
+        ctx.cookies.set("gid", token, {httpOnly: true, secure: true, sameSite: "none"});
     }
 }
 
