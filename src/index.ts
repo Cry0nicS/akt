@@ -34,7 +34,9 @@ import {DataSource} from "typeorm";
     // Create a new Apollo server.
     const httpServer = http.createServer();
     const server = new ApolloServer({
-        debug: true,
+        debug:
+            env.get("APP_ENV").required().asEnum(["development", "production", "test"]) ===
+            "development",
         schema: await createSchema(),
         plugins: [ApolloServerPluginDrainHttpServer({httpServer})],
         csrfPrevention: true,

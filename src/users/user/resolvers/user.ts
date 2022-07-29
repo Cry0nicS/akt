@@ -1,14 +1,22 @@
 import env from "env-var";
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports -- Seems like a bug in ESLint.
+import type {Context} from "../../../app/utils/interfaces/context";
+import type {JWTPayload} from "jose";
 import {Arg, Ctx, Int, Mutation, Query, Resolver, UseMiddleware} from "type-graphql";
 import {CreateUserInput} from "../types/create-user";
 import {isAuthenticated} from "../services/authenticate";
-import {LoginResponse} from "../types/login-response";
 import {LoginUserInput} from "../types/login-user";
+import {LoginUserResult, RefreshTokenResult} from "../types/result-type";
 import {Service} from "typedi";
+import {UnexpectedError} from "../../../app/utils/errors/unexpected-error";
 import {UserService} from "../services/user";
 import {User} from "../models/user";
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports -- Seems like a bug in ESLint.
-import type {Context} from "../../../app/utils/interfaces/context";
+import {
+    invalidEmailOrPassword,
+    invalidRefreshToken,
+    missingRefreshToken,
+    refreshTokenVersionNotMatched
+} from "../errors/user-error";
 
 @Service()
 @Resolver(() => User)
@@ -41,15 +49,24 @@ class UserResolver {
         return true;
     }
 
-    @Mutation(() => LoginResponse)
+    @Mutation(() => LoginUserResult)
     public async loginUser(
         @Arg("data") {email, password}: LoginUserInput,
         @Ctx() ctx: Context
-    ): Promise<LoginResponse> {
-        const user = await this.userService.getOneByEmail(email);
+    ): Promise<typeof LoginUserResult> {
+        const result = await this.userService.getOneByEmail(email);
+
+        // Result is an error if the user does not exist. Message is a property on the error.
+        if ("message" in result) {
+            return result;
+        }
+
+        // Result is a user.
+        const user = result;
 
         if (!(await user.verifyPassword(password))) {
-            throw new Error("You have entered an invalid username or password.");
+            // Return an error if the password is invalid.
+            return invalidEmailOrPassword;
         }
 
         // Generate a refresh token and store it in a cookie.
@@ -78,21 +95,28 @@ class UserResolver {
         return true;
     }
 
-    @Mutation(() => LoginResponse)
-    public async refreshToken(@Ctx() ctx: Context): Promise<LoginResponse> {
+    @Mutation(() => RefreshTokenResult)
+    public async refreshToken(@Ctx() ctx: Context): Promise<typeof RefreshTokenResult> {
         const currentRefreshToken = ctx.cookies.get("gid");
 
-        if (currentRefreshToken === undefined) throw new Error("No refresh token found.");
+        if (currentRefreshToken === undefined) return missingRefreshToken;
 
-        const payload = await UserService.validateJwtToken(
-            currentRefreshToken,
-            env.get("EDDSA_REFRESH_PUBLIC").required().asString()
-        );
+        let payload: Pick<JWTPayload, "jti" | "sub">;
+
+        try {
+            payload = await UserService.validateJwtToken(
+                currentRefreshToken,
+                env.get("EDDSA_REFRESH_PUBLIC").required().asString()
+            );
+        } catch (e) {
+            return invalidRefreshToken;
+        }
 
         const userId = payload.sub ?? null;
         const payloadTokenVersion = payload.jti ?? null;
 
-        if (userId === null) throw new Error("Refresh token is invalid.");
+        if (userId === null)
+            return new UnexpectedError("User ID could not be extracted from the refresh token.");
 
         const user = await this.userService.getOneById(parseInt(userId, 10));
 
@@ -102,7 +126,7 @@ class UserResolver {
             payloadTokenVersion === null ||
             user.tokenVersion !== parseInt(payloadTokenVersion, 10)
         ) {
-            throw new Error("Refresh token is invalid.");
+            return refreshTokenVersionNotMatched;
         }
 
         // Regenerate the refresh token and store it in the cookie.

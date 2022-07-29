@@ -1,6 +1,8 @@
 import type {CreateUserInput} from "../types/create-user";
 import type {JWTPayload} from "jose";
+import type {UserResult} from "../types/result-type";
 import {importPKCS8, importSPKI, jwtVerify, SignJWT} from "jose";
+import {NotFoundError} from "../../../app/utils/errors/not-found-error";
 import {Service} from "typedi";
 import {UserRepository} from "../repositories/user";
 import {User} from "../models/user";
@@ -27,13 +29,13 @@ class UserService {
         return user;
     }
 
-    public async getOneByEmail(email: string): Promise<User> {
+    public async getOneByEmail(email: string): Promise<typeof UserResult> {
         const user = await this.userRepository
             .createQueryBuilder("u")
             .where("u.email = :email", {email})
             .getOne();
 
-        if (!user) throw new Error("Email or password incorrect.");
+        if (!user) return new NotFoundError("User", "email", email);
 
         return user;
     }
