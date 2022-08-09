@@ -6,7 +6,7 @@ import {Arg, Ctx, Int, Mutation, Query, Resolver, UseMiddleware} from "type-grap
 import {CreateUserInput} from "../types/create-user";
 import {isAuthenticated} from "../services/authenticate";
 import {LoginUserInput} from "../types/login-user";
-import {LoginUserResult, RefreshTokenResult} from "../types/result-type";
+import {isUser, LoginUserResult, RefreshTokenResult} from "../types/result-type";
 import {Service} from "typedi";
 import {UnexpectedError} from "../../../app/utils/errors/unexpected-error";
 import {UserError} from "../errors/user-error";
@@ -51,12 +51,11 @@ class UserResolver {
     ): Promise<typeof LoginUserResult> {
         const result = await this.userService.getOneByEmail(email);
 
-        // Result is an error if the user does not exist. Message is a property on the error.
-        if ("message" in result) {
+        if (!isUser(result)) {
             return result;
         }
 
-        // Result is a user.
+        // Variable used just for commodity.
         const user = result;
 
         if (!(await user.verifyPassword(password))) {

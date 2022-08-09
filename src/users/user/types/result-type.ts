@@ -8,7 +8,18 @@ import {NotFoundError} from "../../../app/utils/errors/not-found-error";
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const RefreshTokenResult = createUnionType({
     name: "RefreshTokenResult",
-    types: () => [LoginResponse, BaseError]
+    types: () => [LoginResponse, BaseError],
+    resolveType: (value) => {
+        if ("message" in value) {
+            return BaseError;
+        }
+
+        if ("accessToken" in value) {
+            return LoginResponse;
+        }
+
+        return undefined;
+    }
 });
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -45,4 +56,7 @@ const UserResult = createUnionType({
     }
 });
 
-export {RefreshTokenResult, LoginUserResult, UserResult};
+// Type guards.
+const isUser = (result: typeof UserResult): result is User => result.id !== undefined;
+
+export {isUser, LoginUserResult, RefreshTokenResult, UserResult};
