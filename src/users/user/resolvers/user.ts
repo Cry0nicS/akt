@@ -9,14 +9,9 @@ import {LoginUserInput} from "../types/login-user";
 import {LoginUserResult, RefreshTokenResult} from "../types/result-type";
 import {Service} from "typedi";
 import {UnexpectedError} from "../../../app/utils/errors/unexpected-error";
+import {UserError} from "../errors/user-error";
 import {UserService} from "../services/user";
 import {User} from "../models/user";
-import {
-    invalidEmailOrPassword,
-    invalidRefreshToken,
-    missingRefreshToken,
-    refreshTokenVersionNotMatched
-} from "../errors/user-error";
 
 @Service()
 @Resolver(() => User)
@@ -66,7 +61,7 @@ class UserResolver {
 
         if (!(await user.verifyPassword(password))) {
             // Return an error if the password is invalid.
-            return invalidEmailOrPassword;
+            return UserError.invalidEmailOrPassword();
         }
 
         // Generate a refresh token and store it in a cookie.
@@ -99,7 +94,7 @@ class UserResolver {
     public async refreshToken(@Ctx() ctx: Context): Promise<typeof RefreshTokenResult> {
         const currentRefreshToken = ctx.cookies.get("gid");
 
-        if (currentRefreshToken === undefined) return missingRefreshToken;
+        if (currentRefreshToken === undefined) return UserError.missingRefreshToken();
 
         let payload: Pick<JWTPayload, "jti" | "sub">;
 
@@ -109,7 +104,7 @@ class UserResolver {
                 env.get("EDDSA_REFRESH_PUBLIC").required().asString()
             );
         } catch (e) {
-            return invalidRefreshToken;
+            return UserError.invalidRefreshToken();
         }
 
         const userId = payload.sub ?? null;
@@ -126,7 +121,7 @@ class UserResolver {
             payloadTokenVersion === null ||
             user.tokenVersion !== parseInt(payloadTokenVersion, 10)
         ) {
-            return refreshTokenVersionNotMatched;
+            return UserError.refreshTokenVersionNotMatched();
         }
 
         // Regenerate the refresh token and store it in the cookie.
