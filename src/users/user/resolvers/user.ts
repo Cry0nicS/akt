@@ -1,12 +1,12 @@
 import env from "env-var";
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- Seems like a bug in ESLint.
 import type {Context} from "../../../app/utils/interfaces/context";
-import type {JWTPayload} from "jose";
 import {Arg, Ctx, Int, Mutation, Query, Resolver, UseMiddleware} from "type-graphql";
 import {CreateUserInput} from "../types/create-user";
 import {isAuthenticated} from "../services/authenticate";
 import {LoginUserInput} from "../types/login-user";
-import {isUser, LoginUserResult, RefreshTokenResult} from "../types/result-type";
+import type {UserResult} from "../types/result-type";
+import {isError, isUser, LoginUserResult, RefreshTokenResult} from "../types/result-type";
 import {Service} from "typedi";
 import {UnexpectedError} from "../../../app/utils/errors/unexpected-error";
 import {UserError} from "../errors/user-error";
@@ -24,10 +24,10 @@ class UserResolver {
 
     @Query(() => User)
     @UseMiddleware(isAuthenticated)
-    public async activeUser(@Ctx() ctx: Context): Promise<User> {
+    public async activeUser(@Ctx() ctx: Context): Promise<typeof UserResult> {
         const userId = ctx.activeUserId ?? null;
 
-        if (userId === null) throw new Error("User not logged in.");
+        if (userId === null) return UserError.userNotLoggedIn();
 
         return this.userService.getOneById(parseInt(userId, 10));
     }
@@ -95,29 +95,30 @@ class UserResolver {
 
         if (currentRefreshToken === undefined) return UserError.missingRefreshToken();
 
-        let payload: Pick<JWTPayload, "jti" | "sub">;
+        const result = await UserService.validateJwtToken(
+            currentRefreshToken,
+            env.get("EDDSA_REFRESH_PUBLIC").required().asString()
+        );
 
-        try {
-            payload = await UserService.validateJwtToken(
-                currentRefreshToken,
-                env.get("EDDSA_REFRESH_PUBLIC").required().asString()
-            );
-        } catch (e) {
-            return UserError.invalidRefreshToken();
-        }
+        if (isError(result)) return UserError.invalidRefreshToken();
 
-        const userId = payload.sub ?? null;
-        const payloadTokenVersion = payload.jti ?? null;
+        const userId = result.sub;
+        const payloadTokenVersion = result.jti;
 
-        if (userId === null)
+        if (userId === undefined)
             return new UnexpectedError("User ID could not be extracted from the refresh token.");
 
-        const user = await this.userService.getOneById(parseInt(userId, 10));
+        const userResult = await this.userService.getOneById(parseInt(userId, 10));
+
+        if (!isUser(userResult)) return userResult;
+
+        // Variable used just for commodity.
+        const user = userResult;
 
         // Compare to token version stored in the database with the one from the payload.
         // TODO: Move this to a service method and use it in the authentication middleware.
         if (
-            payloadTokenVersion === null ||
+            payloadTokenVersion === undefined ||
             user.tokenVersion !== parseInt(payloadTokenVersion, 10)
         ) {
             return UserError.refreshTokenVersionNotMatched();

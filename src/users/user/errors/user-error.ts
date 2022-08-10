@@ -26,6 +26,14 @@ class UserError extends BaseError {
             "Email and password do not match."
         );
     }
+
+    public static authenticationError(message: string): UserError {
+        return new UserError("Authentication error.", "AUTHENTICATION_ERROR", 401, message);
+    }
+
+    public static userNotLoggedIn(): UserError {
+        return new UserError("User not logged in.", "USER_NOT_LOGGED_IN", 401);
+    }
 }
 
 export {UserError};

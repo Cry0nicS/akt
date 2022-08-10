@@ -1,9 +1,9 @@
 import type {CreateUserInput} from "../types/create-user";
-import type {JWTPayload} from "jose";
-import type {UserResult} from "../types/result-type";
+import type {UserResult, VerifyTokenResult} from "../types/result-type";
 import {importPKCS8, importSPKI, jwtVerify, SignJWT} from "jose";
 import {NotFoundError} from "../../../app/utils/errors/not-found-error";
 import {Service} from "typedi";
+import {UserError} from "../errors/user-error";
 import {UserRepository} from "../repositories/user";
 import {User} from "../models/user";
 
@@ -21,10 +21,10 @@ class UserService {
         return this.userRepository.save(user);
     }
 
-    public async getOneById(id: number): Promise<User> {
+    public async getOneById(id: number): Promise<typeof UserResult> {
         const user = await this.userRepository.findOneBy({id});
 
-        if (!user) throw new Error("User not found.");
+        if (!user) return new NotFoundError("User", "id", id.toString());
 
         return user;
     }
@@ -50,7 +50,8 @@ class UserService {
     public static async validateJwtToken(
         token: string,
         publicKey: string
-    ): Promise<Pick<JWTPayload, "jti" | "sub">> {
+    ): Promise<VerifyTokenResult> {
+        let errorMessage = "Unexpected error while authenticating.";
         const importedPublicKey = await importSPKI(publicKey, "EdDSA");
 
         try {
@@ -60,13 +61,13 @@ class UserService {
             return result.payload;
         } catch (e) {
             if (typeof e === "string") {
-                throw new Error(e);
+                errorMessage = e;
             } else if (e instanceof Error) {
-                throw new Error(e.message);
+                errorMessage = e.message;
             }
-
-            throw new Error("Unexpected error while authenticating.");
         }
+
+        return UserError.authenticationError(errorMessage);
     }
 
     // TODO: Consider having a separate service method for generating the JWT refresh token
