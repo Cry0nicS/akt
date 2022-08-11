@@ -1,13 +1,14 @@
-import env from "env-var";
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- Seems like a bug in ESLint.
 import type {Context} from "../../../app/utils/interfaces/context";
+import type {UserResult} from "../types/result-type";
+import env from "env-var";
 import {Arg, Ctx, Int, Mutation, Query, Resolver, UseMiddleware} from "type-graphql";
 import {CreateUserInput} from "../types/create-user";
 import {isAuthenticated} from "../services/authenticate";
-import {LoginUserInput} from "../types/login-user";
-import type {UserResult} from "../types/result-type";
 import {isError, isUser, LoginUserResult, RefreshTokenResult} from "../types/result-type";
+import {LoginUserInput} from "../types/login-user";
 import {Service} from "typedi";
+import {SuccessfulResponse} from "../../../app/utils/success/successful-response";
 import {UnexpectedError} from "../../../app/utils/errors/unexpected-error";
 import {UserError} from "../errors/user-error";
 import {UserService} from "../services/user";
@@ -37,11 +38,11 @@ class UserResolver {
         return this.userService.create(data);
     }
 
-    @Mutation(() => Boolean)
-    public logoutUser(@Ctx() ctx: Context): boolean {
+    @Mutation(() => SuccessfulResponse)
+    public logoutUser(@Ctx() ctx: Context): SuccessfulResponse {
         UserResolver.setRefreshTokenCookie(ctx, "");
 
-        return true;
+        return new SuccessfulResponse("User logged out successfully.", true, 200);
     }
 
     @Mutation(() => LoginUserResult)
@@ -80,13 +81,13 @@ class UserResolver {
      * This mutation is only used for testing purposes.
      * User's refresh tokens should be revoked when the user logs out or forget the password..
      */
-    @Mutation(() => Boolean)
+    @Mutation(() => SuccessfulResponse)
     public async revokeUserRefreshToken(
         @Arg("userId", () => Int) userId: number
-    ): Promise<boolean> {
+    ): Promise<SuccessfulResponse> {
         await this.userService.incrementUserRefreshToken(userId);
 
-        return true;
+        return new SuccessfulResponse("Refresh token revoked successfully.", true, 200);
     }
 
     @Mutation(() => RefreshTokenResult)

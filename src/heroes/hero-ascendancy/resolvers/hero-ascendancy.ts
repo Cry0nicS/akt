@@ -1,9 +1,11 @@
 import {Arg, Mutation, Query, Resolver} from "type-graphql";
-import {HeroAscendancy} from "../models/hero-ascendancy";
-import {Service} from "typedi";
-import {HeroAscendancyService} from "../services/hero-ascendancy";
 import {CreateAscendancyInput} from "../types/create-ascendancy";
+import {HeroAscendancyResult} from "../types/result-type";
+import {HeroAscendancyService} from "../services/hero-ascendancy";
+import {HeroAscendancy} from "../models/hero-ascendancy";
 import {HeroClassService} from "../../hero-class/services/hero-class";
+import {Service} from "typedi";
+import {SuccessOrError} from "../../../app/utils/types/result-type";
 
 @Service()
 @Resolver(() => HeroAscendancy)
@@ -24,20 +26,20 @@ class HeroAscendancyResolver {
         return this.heroAscendancyService.findAll();
     }
 
-    @Query(() => HeroAscendancy)
+    @Query(() => HeroAscendancy, {nullable: true})
     public async heroAscendancy(@Arg("id") id: number): Promise<HeroAscendancy | null> {
         return this.heroAscendancyService.findOneById(id);
     }
 
-    @Mutation(() => HeroAscendancy)
+    @Mutation(() => HeroAscendancyResult)
     public async createHeroAscendancy(
         @Arg("data") data: CreateAscendancyInput
-    ): Promise<HeroAscendancy> {
+    ): Promise<typeof HeroAscendancyResult> {
         return this.heroAscendancyService.create(data);
     }
 
-    @Mutation(() => Boolean)
-    public async deleteHeroAscendancy(@Arg("id") id: number): Promise<boolean> {
+    @Mutation(() => SuccessOrError)
+    public async deleteHeroAscendancy(@Arg("id") id: number): Promise<typeof SuccessOrError> {
         return this.heroAscendancyService.delete(id);
     }
 }

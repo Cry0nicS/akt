@@ -1,8 +1,13 @@
-import {Service} from "typedi";
+import type {CreateAscendancyInput} from "../types/create-ascendancy";
+import type {HeroAscendancyResult} from "../types/result-type";
+import type {SuccessOrError} from "../../../app/utils/types/result-type";
 import {HeroAscendancyRepository} from "../repositories/hero-ascendancy";
 import {HeroAscendancy} from "../models/hero-ascendancy";
 import {HeroClassService} from "../../hero-class/services/hero-class";
-import type {CreateAscendancyInput} from "../types/create-ascendancy";
+import {isHeroClass} from "../../hero-class/services/result-type";
+import {NotFoundError} from "../../../app/utils/errors/not-found-error";
+import {Service} from "typedi";
+import {SuccessfulResponse} from "../../../app/utils/success/successful-response";
 
 @Service()
 class HeroAscendancyService {
@@ -25,23 +30,30 @@ class HeroAscendancyService {
         return this.heroAscendancyRepository.findOneById(id);
     }
 
-    public async create(data: CreateAscendancyInput): Promise<HeroAscendancy> {
+    public async create(data: CreateAscendancyInput): Promise<typeof HeroAscendancyResult> {
         const heroAscendancy = Object.assign(new HeroAscendancy(), data);
-        heroAscendancy.heroClass = await this.heroClassService.getOneById(data.heroClassId);
+
+        const result = await this.heroClassService.getOneById(data.heroClassId);
+
+        if (!isHeroClass(result)) {
+            return result;
+        }
+
+        heroAscendancy.heroClass = result;
 
         return this.heroAscendancyRepository.save(heroAscendancy);
     }
 
-    public async delete(id: number): Promise<boolean> {
+    public async delete(id: number): Promise<typeof SuccessOrError> {
         const heroAscendancy = await this.heroAscendancyRepository.findOneBy({id});
 
         if (!heroAscendancy) {
-            throw new Error(`Hero ascendancy with ID "${id.toString()}" could not be found`);
+            return new NotFoundError("Hero ascendancy", "id", id.toString());
         }
 
         await this.heroAscendancyRepository.remove(heroAscendancy);
 
-        return true;
+        return new SuccessfulResponse("Hero ascendancy successfully deleted", true, 200);
     }
 }
 

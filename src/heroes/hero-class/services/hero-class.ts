@@ -1,6 +1,10 @@
-import {HeroClass} from "../models/hero-class";
-import {Service} from "typedi";
+import type {HeroClassResult} from "./result-type";
+import type {SuccessOrError} from "../../../app/utils/types/result-type";
 import {HeroClassRepository} from "../repositories/hero-class";
+import {HeroClass} from "../models/hero-class";
+import {NotFoundError} from "../../../app/utils/errors/not-found-error";
+import {Service} from "typedi";
+import {SuccessfulResponse} from "../../../app/utils/success/successful-response";
 
 @Service()
 class HeroClassService {
@@ -23,14 +27,12 @@ class HeroClassService {
 
     /**
      *  Get methods always returns the desired entity. If this does not exist, an error is thrown.
-     *
-     *  @throws {Error}
      *  Thrown if the hero class does not exist.
      */
-    public async getOneById(id: number): Promise<HeroClass> {
+    public async getOneById(id: number): Promise<typeof HeroClassResult> {
         const heroClass = await this.heroClassRepository.findOneById(id);
 
-        if (!heroClass) throw new Error(`Hero class with ID "${id.toString()}" not found.`);
+        if (!heroClass) return new NotFoundError("Hero class", "id", id.toString());
 
         return heroClass;
     }
@@ -42,12 +44,14 @@ class HeroClassService {
         return this.heroClassRepository.findOneById(id);
     }
 
-    public async delete(id: number): Promise<boolean> {
-        const heroClass = await this.getOneById(id);
+    public async delete(id: number): Promise<typeof SuccessOrError> {
+        const heroClass = await this.heroClassRepository.findOneById(id);
+
+        if (!heroClass) return new NotFoundError("Hero class", "id", id.toString());
 
         await this.heroClassRepository.remove(heroClass);
 
-        return true;
+        return new SuccessfulResponse("Hero class successfully deleted", true, 200);
     }
 }
 

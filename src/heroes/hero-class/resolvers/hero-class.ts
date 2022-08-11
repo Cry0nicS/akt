@@ -2,6 +2,7 @@ import {Arg, Mutation, Query, Resolver} from "type-graphql";
 import {HeroClassService} from "../services/hero-class";
 import {HeroClass} from "../models/hero-class";
 import {Service} from "typedi";
+import {SuccessOrError} from "../../../app/utils/types/result-type";
 
 @Service()
 @Resolver(() => HeroClass)
@@ -30,8 +31,8 @@ class HeroClassResolver {
         return this.heroClassService.create({name, imageUrl});
     }
 
-    @Mutation(() => Boolean)
-    public async deleteHeroClass(@Arg("id") id: number): Promise<boolean> {
+    @Mutation(() => SuccessOrError)
+    public async deleteHeroClass(@Arg("id") id: number): Promise<typeof SuccessOrError> {
         return this.heroClassService.delete(id);
     }
 }
